@@ -13,10 +13,11 @@ require './linked_list'
 
 # A HashMap for strings data type using linked lists and dynamic rehashing.
 class HashMap
+  attr_accessor :buckets
 
   def initialize
-    @buckets = Array.new(8)
-    @loadfactor = 0.75
+    @buckets = Array.new(1)
+    @loadfactor = 1
     @size = 0
   end
 
@@ -32,8 +33,17 @@ class HashMap
   end
 
   def set(key, value)
-    # If key already exists, old value is over-written
-    # Calculate if bucket has reached @loadfactor, grow buckets size if needed.
+    hash_key = hash(key)
+    # Create a new Linked List if there is none at the location.
+    @buckets[hash_key] = LinkedList.new if @buckets[hash_key].nil?
+    # Update the key and return, if it already exists.
+    return unless @buckets[hash_key].update_value(key, value).nil?
+
+    # Otherwise, add the new item to the beginning of the list and increase the size.
+    @buckets[hash_key].prepend(key, value)
+    @size += 1
+
+    # rehash if @size / @buckets.length > @loadfactor
   end
 
   def rehash
@@ -43,16 +53,29 @@ class HashMap
     # return true.
   end
 
+  # Return value assigned to key, or nil if not found.
   def get(key)
-    # return value assigned to key, or nil if not found.
+    @buckets[hash(key)].value_from_key(key)
+    # bucket.find_key(key).value
   end
 
+  def key?(key)
+    return false if @buckets[hash(key)].nil?
+
+    @buckets[hash(key)].contains_key?(key)
+  end
+
+  # Remove and return value. Nil if not found.
   def remove(key)
-    # Remove and return value. Nil if not found.
+    return nil if @buckets[hash(key)].nil?
+
+    @buckets[hash(key)].remove(key)
   end
 
+  # Returns number of keys in hash map
   def length
-    # Returns number of keys in hash map
+    key_count = 0
+    @buckets.each { |bucket| key_count += bucket.size unless bucket.nil?}
   end
 
   def clear
