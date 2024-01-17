@@ -47,7 +47,10 @@ class HashMap
   end
 
   def get(key)
+    hash_key = hash(key)
+    return nil if @buckets[hash_key].nil?
 
+    @buckets[hash_key].value_from_key(key)
   end
 
   def to_s
@@ -83,6 +86,13 @@ class LinkedList
     cursor = Node.new(nil, nil, @head)
     cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
     cursor.key == key ? cursor.value = value : nil
+  end
+
+  def value_from_key(key)
+    cursor = Node.new(nil, nil, @head)
+
+    cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
+    cursor.key == key ? cursor.value : nil
   end
 
   def to_s
@@ -126,11 +136,15 @@ end
 # test_list.prepend("key1", "value1")
 # p test_list.to_a
 # test_list.prepend("key2", "value2")
-# p test_list
+# puts test_list
 # p test_list.contains?('key1')
 # p test_list.update_value('key1', 'new_value')
-# p test_list
+# puts test_list
 # p test_list.to_a
+# p test_list.value_from_key('key1')
+# p test_list.value_from_key('key2')
+# p test_list.value_from_key('key3')
+
 
 test_hash = HashMap.new
 puts test_hash
@@ -145,3 +159,6 @@ test_hash.set('key4', 'value4')
 test_hash.set('key5', 'value5')
 test_hash.set('key6', 'value6')
 puts test_hash
+puts test_hash.get('key2')
+puts test_hash.get('key5')
+p test_hash.get('key10')
