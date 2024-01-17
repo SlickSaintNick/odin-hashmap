@@ -53,11 +53,28 @@ class HashMap
     @buckets[hash_key].value_from_key(key)
   end
 
+  def remove(key)
+    hash_key = hash(key)
+    return nil if @buckets[hash_key].nil?
+
+    @buckets[hash_key].remove_key(key)
+  end
+
   def key?(key)
     hash_key = hash(key)
     return false if @buckets[hash_key].nil?
 
     @buckets[hash_key].contains?(key)
+  end
+
+  def length
+    size = 0
+    @buckets.each do |bucket|
+      next if bucket.nil?
+
+      size += bucket.size
+    end
+    size
   end
 
   def to_s
@@ -100,6 +117,42 @@ class LinkedList
 
     cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
     cursor.key == key ? cursor.value : nil
+  end
+
+  def remove_key(key)
+    return nil if @head.nil?
+
+    if @head.key == key
+      temp = @head.value
+      @head = @head.next_node
+      return temp
+    end
+
+    prev = Node.new(nil, nil, @head)
+    cursor = Node.new(nil, nil, @head.next_node)
+    until cursor.key == key || cursor.next_node.nil?
+      cursor = cursor.next_node
+      prev = prev.next_node
+    end
+
+    if cursor.key == key
+      temp = cursor.value
+      prev.next_node = cursor.next_node
+      temp
+    else
+      nil
+    end
+  end
+
+  def size
+    size = 0
+    cursor = Node.new(nil, nil, @head)
+
+    until cursor.next_node.nil?
+      cursor = cursor.next_node
+      size += 1
+    end
+    size
   end
 
   def to_s
@@ -151,7 +204,13 @@ end
 # p test_list.value_from_key('key1')
 # p test_list.value_from_key('key2')
 # p test_list.value_from_key('key3')
-
+# puts test_list
+# puts test_list.size
+# p test_list.remove_key('key1')
+# p test_list.remove_key('key2')
+# p test_list.remove_key('key2')
+# puts test_list
+# puts test_list.size
 
 test_hash = HashMap.new
 puts test_hash
@@ -166,8 +225,13 @@ test_hash.set('key4', 'value4')
 test_hash.set('key5', 'value5')
 test_hash.set('key6', 'value6')
 puts test_hash
+puts test_hash.length
 puts test_hash.get('key2')
 puts test_hash.get('key5')
 p test_hash.get('key10')
 p test_hash.key?('key2')
 p test_hash.key?('foo')
+puts test_hash.remove('key3')
+puts test_hash.remove('key5')
+puts test_hash
+puts test_hash.length
