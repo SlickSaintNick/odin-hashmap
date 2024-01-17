@@ -46,8 +46,17 @@ class HashMap
     end
   end
 
-  def to_s
+  def get(key)
 
+  end
+
+  def to_s
+    @buckets.each_with_index do |bucket, index|
+      print "#{index} -> "
+      print bucket.nil? ? 'nil' : bucket.to_s
+      print "\n"
+    end
+    puts 'END'
   end
 end
 
@@ -124,10 +133,15 @@ end
 # p test_list.to_a
 
 test_hash = HashMap.new
-p test_hash.buckets[0..]
+puts test_hash
 test_hash.set('key1', 'value1')
 test_hash.set('key2', 'value2')
-p test_hash.buckets[0..]
+puts test_hash
 test_hash.set('key1', 'new value1')
 test_hash.set('key2', 'new value2')
-p test_hash.buckets[0..]
+puts test_hash
+test_hash.set('key3', 'value3')
+test_hash.set('key4', 'value4')
+test_hash.set('key5', 'value5')
+test_hash.set('key6', 'value6')
+puts test_hash
