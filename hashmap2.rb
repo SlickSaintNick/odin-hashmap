@@ -53,6 +53,13 @@ class HashMap
     @buckets[hash_key].value_from_key(key)
   end
 
+  def key?(key)
+    hash_key = hash(key)
+    return false if @buckets[hash_key].nil?
+
+    @buckets[hash_key].contains?(key)
+  end
+
   def to_s
     @buckets.each_with_index do |bucket, index|
       print "#{index} -> "
@@ -162,3 +169,5 @@ puts test_hash
 puts test_hash.get('key2')
 puts test_hash.get('key5')
 p test_hash.get('key10')
+p test_hash.key?('key2')
+p test_hash.key?('foo')
