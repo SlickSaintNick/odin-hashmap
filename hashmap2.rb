@@ -5,8 +5,8 @@ class HashMap
   attr_accessor :buckets
 
   def initialize
-    @buckets = Array.new(1)
-    @loadfactor = 1
+    @buckets = Array.new(2)
+    @loadfactor = 0.75
     @size = 0
   end
 
@@ -28,7 +28,26 @@ class HashMap
       @buckets[hash_key].update_value(key, value)
     else
       @buckets[hash_key].prepend(key, value)
+      @size += 1
+      rehash if @size.to_f / @buckets.length >= @loadfactor
     end
+  end
+
+  def rehash
+    old_buckets = @buckets.dup
+    @buckets = Array.new(old_buckets.length * 2)
+    @size = 0
+    old_buckets.each do |bucket|
+      next if bucket.nil?
+
+      bucket.to_a.each do |entry|
+        set(entry[0], entry[1]) unless entry[0].nil?
+      end
+    end
+  end
+
+  def to_s
+
   end
 end
 
@@ -56,6 +75,30 @@ class LinkedList
     cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
     cursor.key == key ? cursor.value = value : nil
   end
+
+  def to_s
+    string = ''
+    cursor = Node.new(nil, nil, @head)
+
+    until cursor.next_node.nil?
+      cursor = cursor.next_node
+      string += "( #{cursor.key}: #{cursor.value} ) -> "
+    end
+
+    "#{string}nil"
+  end
+
+  def to_a
+    return nil if @head.nil?
+
+    array = []
+    cursor = Node.new(nil, nil, @head)
+    until cursor.next_node.nil?
+      cursor = cursor.next_node
+      array.push([cursor.key, cursor.value])
+    end
+    array
+  end
 end
 
 # Node forms structure of singly LinkedList
@@ -70,18 +113,21 @@ class Node
 end
 
 # test_list = LinkedList.new
+# p test_list.to_a
 # test_list.prepend("key1", "value1")
+# p test_list.to_a
 # test_list.prepend("key2", "value2")
 # p test_list
 # p test_list.contains?('key1')
 # p test_list.update_value('key1', 'new_value')
 # p test_list
+# p test_list.to_a
 
 test_hash = HashMap.new
-p test_hash.buckets[0]
+p test_hash.buckets[0..]
 test_hash.set('key1', 'value1')
 test_hash.set('key2', 'value2')
-p test_hash.buckets[0]
+p test_hash.buckets[0..]
 test_hash.set('key1', 'new value1')
 test_hash.set('key2', 'new value2')
-p test_hash.buckets[0]
+p test_hash.buckets[0..]
