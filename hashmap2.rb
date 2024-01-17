@@ -4,8 +4,8 @@
 class HashMap
   attr_accessor :buckets
 
-  def initialize
-    @buckets = Array.new(2)
+  def initialize(initial_capacity)
+    @buckets = Array.new(initial_capacity)
     @loadfactor = 0.75
     @size = 0
   end
@@ -75,6 +75,41 @@ class HashMap
       size += bucket.size
     end
     size
+  end
+
+  def clear
+    @buckets = Array.new(@buckets.size)
+    @size = 0
+  end
+
+  def keys
+    keys = []
+    @buckets.each do |bucket|
+      next if bucket.nil?
+
+      bucket.to_a.each { |element| keys.push(element[0]) }
+    end
+    keys
+  end
+
+  def values
+    values = []
+    @buckets.each do |bucket|
+      next if bucket.nil?
+
+      bucket.to_a.each { |element| values.push(element[1]) }
+    end
+    values
+  end
+
+  def entries
+    entries = []
+    @buckets.each do |bucket|
+      next if bucket.nil?
+
+      bucket.to_a.each { |element| entries.push(element) }
+    end
+    entries
   end
 
   def to_s
@@ -212,7 +247,7 @@ end
 # puts test_list
 # puts test_list.size
 
-test_hash = HashMap.new
+test_hash = HashMap.new(4)
 puts test_hash
 test_hash.set('key1', 'value1')
 test_hash.set('key2', 'value2')
@@ -235,3 +270,8 @@ puts test_hash.remove('key3')
 puts test_hash.remove('key5')
 puts test_hash
 puts test_hash.length
+p test_hash.keys
+p test_hash.values
+p test_hash.entries
+test_hash.clear
+puts test_hash
