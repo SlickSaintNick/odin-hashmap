@@ -4,7 +4,7 @@
 class HashMap
   attr_accessor :buckets
 
-  def initialize(initial_capacity)
+  def initialize(initial_capacity = 16)
     @buckets = Array.new(initial_capacity)
     @loadfactor = 0.75
     @size = 0
@@ -39,6 +39,7 @@ class HashMap
       @size += 1
       rehash if @size.to_f / @buckets.length >= @loadfactor
     end
+    value
   end
 
   def get(key)
@@ -88,18 +89,19 @@ class HashMap
   end
 
   def to_s
+    string = "-----\n"
     @buckets.each_with_index do |bucket, index|
-      print "#{index} -> "
-      print bucket.nil? ? 'nil' : bucket.to_s
-      print "\n"
+      string += "#{index} -> "
+      string += bucket.nil? ? 'nil' : bucket.to_s
+      string += "\n"
     end
-    puts 'END'
+    string += "-----\n"
   end
 end
 
 # Singly Linked List and methods to support HashMap class.
 class LinkedList
-  attr_reader :head, :cursor
+  attr_reader :head
 
   def initialize
     @head = nil
@@ -200,52 +202,29 @@ class Node
   end
 end
 
-# test_list = LinkedList.new
-# p test_list.to_a
-# test_list.prepend("key1", "value1")
-# p test_list.to_a
-# test_list.prepend("key2", "value2")
-# puts test_list
-# p test_list.contains?('key1')
-# p test_list.update_value('key1', 'new_value')
-# puts test_list
-# p test_list.to_a
-# p test_list.value_from_key('key1')
-# p test_list.value_from_key('key2')
-# p test_list.value_from_key('key3')
-# puts test_list
-# puts test_list.size
-# p test_list.remove_key('key1')
-# p test_list.remove_key('key2')
-# p test_list.remove_key('key2')
-# puts test_list
-# puts test_list.size
-
-test_hash = HashMap.new(4)
-puts test_hash
-test_hash.set('key1', 'value1')
-test_hash.set('key2', 'value2')
-puts test_hash
-test_hash.set('key1', 'new value1')
-test_hash.set('key2', 'new value2')
-puts test_hash
-test_hash.set('key3', 'value3')
-test_hash.set('key4', 'value4')
-test_hash.set('key5', 'value5')
-test_hash.set('key6', 'value6')
-puts test_hash
-puts test_hash.length
-puts test_hash.get('key2')
-puts test_hash.get('key5')
-p test_hash.get('key10')
-p test_hash.key?('key2')
-p test_hash.key?('foo')
-puts test_hash.remove('key3')
-puts test_hash.remove('key5')
-puts test_hash
-puts test_hash.length
-p test_hash.keys
-p test_hash.values
-p test_hash.entries
-test_hash.clear
-puts test_hash
+books = HashMap.new(4)
+puts 'Books and authors - a HashMap...'
+puts books
+gets
+puts "Put #{books.set('Leo Tolstoy', 'Anna Karenina')} and "\
+     "#{books.set('Fyodor Dostoyevsky', 'Crime and Punishment')} "\
+     'on the shelf...'
+puts books
+gets
+puts "Put #{books.set('James Joyce', 'Ulysses')} on there... time for a bigger shelf..."
+puts books
+gets
+puts "Put #{books.set('China Mieville', 'Perdido Street Station')} and "\
+     "#{books.set('Haruki Murakami', 'Norwegian Wood')} "\
+     'on there as well...'
+puts books
+puts "Now there are #{books.length} books."
+puts "The book by Tolstoy is #{books.get('Leo Tolstoy')}. I'll swap it for "\
+     "#{books.set('Leo Tolstoy', 'War and Peace')}."
+puts books
+gets
+puts "The list of authors is: #{books.keys}."
+puts "The list of titles is: #{books.values}."
+puts 'Time to clear the shelf!'
+books.clear
+puts books
