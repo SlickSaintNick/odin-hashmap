@@ -20,6 +20,7 @@ class HashMap
   end
 
   def rehash
+    # Double the number of buckets and rehash all the entries.
     current_entries = entries
     @buckets = Array.new(@buckets.length * 2)
     @size = 0
@@ -30,7 +31,7 @@ class HashMap
     hash_key = hash(key)
     # Add a new LinkedList if there is none at that location.
     @buckets[hash_key] = LinkedList.new if @buckets[hash_key].nil?
-    # Check if the key already exists.
+    # Check if the key already exists. If it does, update it. If it doesn't, add it and increase size.
     if @buckets[hash_key].contains?(key)
       @buckets[hash_key].update_value(key, value)
     else
@@ -51,8 +52,9 @@ class HashMap
     hash_key = hash(key)
     return nil if @buckets[hash_key].nil?
 
-    @size -= 1
-    @buckets[hash_key].remove_key(key)
+    value = @buckets[hash_key].remove_key(key)
+    @size -= 1 unless value.nil?
+    value
   end
 
   def key?(key)
@@ -71,34 +73,18 @@ class HashMap
     @size = 0
   end
 
-  def keys
-    keys = []
-    @buckets.each do |bucket|
-      next if bucket.nil?
+  def entries
+    entries = []
+    @buckets.each { |bucket| entries += bucket.to_a unless bucket.nil? }
+    entries
+  end
 
-      bucket.to_a.each { |element| keys.push(element[0]) }
-    end
-    keys
+  def keys
+    entries.map { |entry| entry[0] }
   end
 
   def values
-    values = []
-    @buckets.each do |bucket|
-      next if bucket.nil?
-
-      bucket.to_a.each { |element| values.push(element[1]) }
-    end
-    values
-  end
-
-  def entries
-    entries = []
-    @buckets.each do |bucket|
-      next if bucket.nil?
-
-      bucket.to_a.each { |element| entries.push(element) }
-    end
-    entries
+    entries.map { |entry| entry[1] }
   end
 
   def to_s
@@ -124,21 +110,23 @@ class LinkedList
     value
   end
 
-  def contains?(key)
+  def cursor_to_key(key)
     cursor = Node.new(nil, nil, @head)
     cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
-    cursor.key == key
+    cursor
+  end
+
+  def contains?(key)
+    cursor_to_key(key).key == key
   end
 
   def update_value(key, value)
-    cursor = Node.new(nil, nil, @head)
-    cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
+    cursor = cursor_to_key(key)
     cursor.key == key ? cursor.value = value : nil
   end
 
   def value_from_key(key)
-    cursor = Node.new(nil, nil, @head)
-    cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
+    cursor = cursor_to_key(key)
     cursor.key == key ? cursor.value : nil
   end
 
@@ -201,7 +189,7 @@ class LinkedList
   end
 end
 
-# Node forms structure of singly LinkedList
+# Node (key, value) forms structure of singly LinkedList
 class Node
   attr_accessor :key, :value, :next_node
 
