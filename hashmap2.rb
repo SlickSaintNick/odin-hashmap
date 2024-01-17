@@ -138,7 +138,6 @@ class LinkedList
 
   def value_from_key(key)
     cursor = Node.new(nil, nil, @head)
-
     cursor = cursor.next_node until cursor.key == key || cursor.next_node.nil?
     cursor.key == key ? cursor.value : nil
   end
@@ -154,14 +153,7 @@ class LinkedList
       cursor = cursor.next_node
       prev = prev.next_node
     end
-
-    if cursor.key == key
-      temp = cursor.value
-      prev.next_node = cursor.next_node
-      temp
-    else
-      nil
-    end
+    cursor.key == key ? remove_node(prev, cursor) : nil
   end
 
   def remove_head
@@ -170,10 +162,15 @@ class LinkedList
     temp
   end
 
+  def remove_node(prev, cursor)
+    temp = cursor.value
+    prev.next_node = cursor.next_node
+    temp
+  end
+
   def size
     size = 0
     cursor = Node.new(nil, nil, @head)
-
     until cursor.next_node.nil?
       cursor = cursor.next_node
       size += 1
@@ -184,12 +181,10 @@ class LinkedList
   def to_s
     string = ''
     cursor = Node.new(nil, nil, @head)
-
     until cursor.next_node.nil?
       cursor = cursor.next_node
       string += "( #{cursor.key}: #{cursor.value} ) -> "
     end
-
     "#{string}nil"
   end
 
