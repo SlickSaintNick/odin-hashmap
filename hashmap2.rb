@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A HashMap for strings data type using singly-linked lists.
+# A HashMap for String data type using singly-linked lists.
 class HashMap
   attr_accessor :buckets
 
@@ -19,6 +19,13 @@ class HashMap
     sum % @buckets.length
   end
 
+  def rehash
+    current_entries = entries
+    @buckets = Array.new(@buckets.length * 2)
+    @size = 0
+    current_entries.each { |entry| set(entry[0], entry[1]) }
+  end
+
   def set(key, value)
     hash_key = hash(key)
     # Add a new LinkedList if there is none at that location.
@@ -33,19 +40,6 @@ class HashMap
     end
   end
 
-  def rehash
-    old_buckets = @buckets.dup
-    @buckets = Array.new(old_buckets.length * 2)
-    @size = 0
-    old_buckets.each do |bucket|
-      next if bucket.nil?
-
-      bucket.to_a.each do |entry|
-        set(entry[0], entry[1]) unless entry[0].nil?
-      end
-    end
-  end
-
   def get(key)
     hash_key = hash(key)
     return nil if @buckets[hash_key].nil?
@@ -57,6 +51,7 @@ class HashMap
     hash_key = hash(key)
     return nil if @buckets[hash_key].nil?
 
+    @size -= 1
     @buckets[hash_key].remove_key(key)
   end
 
@@ -68,13 +63,7 @@ class HashMap
   end
 
   def length
-    size = 0
-    @buckets.each do |bucket|
-      next if bucket.nil?
-
-      size += bucket.size
-    end
-    size
+    entries.length
   end
 
   def clear
@@ -122,7 +111,7 @@ class HashMap
   end
 end
 
-# Singly Linked List and essential methods.
+# Singly Linked List and methods to support HashMap class.
 class LinkedList
   attr_reader :head, :cursor
 
@@ -157,11 +146,7 @@ class LinkedList
   def remove_key(key)
     return nil if @head.nil?
 
-    if @head.key == key
-      temp = @head.value
-      @head = @head.next_node
-      return temp
-    end
+    return remove_head if @head.key == key
 
     prev = Node.new(nil, nil, @head)
     cursor = Node.new(nil, nil, @head.next_node)
@@ -177,6 +162,12 @@ class LinkedList
     else
       nil
     end
+  end
+
+  def remove_head
+    temp = @head.value
+    @head = @head.next_node
+    temp
   end
 
   def size
